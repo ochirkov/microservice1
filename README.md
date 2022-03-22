@@ -56,7 +56,7 @@ Make sure that you have next ports exposed on your host instance:
 
 Run flake8 and unit tests:
 ```bash
-docker build -t klarna .
+docker build -t microservice1 .
 docker run klarna flake8
 docker run klarna nose2
 ```
