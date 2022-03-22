@@ -40,7 +40,7 @@ Clone repo with sources
 ```bash
 cd
 git clone https://github.com/ochirkov/microservice1.git
-cd klarna_repo
+cd microservice1
 ```
 
 Start env
