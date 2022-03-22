@@ -6,58 +6,8 @@ services:
     build: .
     ports:
       - "5000:5000"
-    depends_on: ['elasticsearch', 'kibana', 'filebeat']
     healthcheck:
       test: ["CMD-SHELL", "curl --silent --fail localhost:5000 || exit 1"]
       interval: 30s
       timeout: 30s
       retries: 3
-
-  elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
-    environment:
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - "discovery.type=single-node"
-    ports:
-      - "9200:9200"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-
-  kibana:
-    image: "docker.elastic.co/kibana/kibana:7.2.0"
-    ports:
-      - "5601:5601"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    volumes:
-      - "./export.ndjson:/tmp/export.ndjson:ro"
-    healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:5601 || exit 1"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-      # TODO: add auto provision of Kibana visualizations
-      # curl -X POST localhost:5601/api/saved_objects/_import?createNewCopies=true -H "kbn-xsrf: true" --form file=@export.ndjson
-
-  filebeat:
-    image: "docker.elastic.co/beats/filebeat:7.2.0"
-    user: root
-    volumes:
-      - "./filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro"
-      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    depends_on: ['elasticsearch']
-    healthcheck:
-      test: filebeat test config
-      interval: 30s
-      timeout: 15s
-      retries: 5
-
-volumes:
-    elasticsearch_data:
